@@ -175,7 +175,7 @@ class ExternalApiController extends BaseController
         $domain = rtrim($domain, '/');
         // Simple PDO check since it's a specific auth case
         $db = \App\Database::getInstance();
-        $stmt = $db->prepare("SELECT * FROM projects WHERE api_key = :key AND (domain = :domain OR domain IS NULL)");
+        $stmt = $db->prepare("SELECT * FROM projects WHERE api_key = :key AND (TRIM(TRAILING '/' FROM domain) = :domain OR domain IS NULL)");
         $stmt->execute(['key' => $key, 'domain' => $domain]);
         $row = $stmt->fetch(\PDO::FETCH_ASSOC);
         return $row ?: null;
