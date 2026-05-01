@@ -16,11 +16,24 @@ class Database
             $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
             $dotenv->safeLoad();
 
-            $host = $_ENV['DB_HOST'] ?? 'localhost';
-            $db = $_ENV['DB_DATABASE'] ?? 'subscription_db';
-            $user = $_ENV['DB_USERNAME'] ?? 'reporting';
-            $pass = $_ENV['DB_PASSWORD'] ?? 'reporting';
-            $port = $_ENV['DB_PORT'] ?? '3306';
+            $httpHost = $_SERVER['HTTP_HOST'] ?? '';
+            $isLocal = (strpos($httpHost, 'localhost') !== false || strpos($httpHost, '127.0.0.1') !== false);
+
+            if (!$isLocal && $httpHost !== '') {
+                // Server Credentials
+                $host = 'localhost';
+                $db   = 'u444388293_subscription';
+                $user = 'u444388293_subscription';
+                $pass = 'AVav@@2026';
+                $port = '3306';
+            } else {
+                // Local Credentials (from .env)
+                $host = $_ENV['DB_HOST'] ?? 'localhost';
+                $db   = $_ENV['DB_DATABASE'] ?? 'subscription_db';
+                $user = $_ENV['DB_USERNAME'] ?? 'reporting';
+                $pass = $_ENV['DB_PASSWORD'] ?? 'reporting';
+                $port = $_ENV['DB_PORT'] ?? '3306';
+            }
             $charset = 'utf8mb4';
 
             $dsn = "mysql:host=$host;dbname=$db;port=$port;charset=$charset";

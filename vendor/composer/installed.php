@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'antigravity/subscription-management',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => null,
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '891a00633a470c8a71df606bfebdc8bb06942a94',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'antigravity/subscription-management' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => null,
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '891a00633a470c8a71df606bfebdc8bb06942a94',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

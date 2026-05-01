@@ -3,7 +3,7 @@
     "description": "Subscription Management Module",
     "type": "project",
     "require": {
-        "php": "^8.2",
+        "php": "^8.1",
         "vlucas/phpdotenv": "^5.6",
         "phpoffice/phpspreadsheet": "^5.7",
         "phpmailer/phpmailer": "^7.0",
@@ -27,6 +27,7 @@
     "config": {
         "allow-plugins": {
             "pestphp/pest-plugin": true
-        }
+        },
+        "platform-check": false
     }
 }
