@@ -33,7 +33,7 @@ class ExternalApiController extends BaseController
     public function registerUser(): void
     {
         try {
-            $data = $this->getJsonInput();
+            $data = $this->getRequestData();
             $apiKey = $data['api_key'] ?? '';
             $domain = $data['domain'] ?? '';
             $username = $data['username'] ?? 'ext_user_' . time();
@@ -97,7 +97,7 @@ class ExternalApiController extends BaseController
     public function validateSubscription(): void
     {
         try {
-            $data = $this->getJsonInput();
+            $data = $this->getRequestData();
             $apiKey = $data['api_key'] ?? '';
             $domain = $data['domain'] ?? '';
 
@@ -172,6 +172,7 @@ class ExternalApiController extends BaseController
 
     private function findProjectByAuth(string $key, string $domain): ?array
     {
+        $domain = rtrim($domain, '/');
         // Simple PDO check since it's a specific auth case
         $db = \App\Database::getInstance();
         $stmt = $db->prepare("SELECT * FROM projects WHERE api_key = :key AND (domain = :domain OR domain IS NULL)");

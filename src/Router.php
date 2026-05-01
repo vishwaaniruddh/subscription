@@ -8,6 +8,9 @@ class Router
 
     public function add(string $method, string $path, callable|array $handler): void
     {
+        if ($path !== '/') {
+            $path = rtrim($path, '/');
+        }
         $path = preg_replace('/\{(\w+)\}/', '(?P<$1>\d+)', $path);
         $this->routes[] = [
             'method' => $method,
@@ -29,6 +32,9 @@ class Router
         header("Access-Control-Allow-Origin: *");
 
         $uri = parse_url($uri, PHP_URL_PATH);
+        if ($uri !== '/') {
+            $uri = rtrim($uri, '/');
+        }
         
         // Handle subdirectory: detect the project root relative to the public folder
         $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']);
@@ -44,9 +50,14 @@ class Router
         }
         
         if (empty($uri) || $uri === '' || $uri === '//') $uri = '/';
+        if ($uri !== '/') {
+            $uri = rtrim($uri, '/');
+        }
 
         foreach ($this->routes as $route) {
-            if ($route['method'] === $method && preg_match($route['path'], $uri, $matches)) {
+            $routePath = $route['path'];
+            // Allow optional trailing slash in matching
+            if ($route['method'] === $method && preg_match($routePath, $uri, $matches)) {
                 $handler = $route['handler'];
                 $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
                 

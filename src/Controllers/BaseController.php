@@ -31,7 +31,13 @@ abstract class BaseController
     {
         $input = file_get_contents('php://input');
         $data = json_decode($input, true);
-        return $data ?? [];
+        return is_array($data) ? $data : [];
+    }
+
+    protected function getRequestData(): array
+    {
+        $json = $this->getJsonInput();
+        return array_merge($_REQUEST, $json);
     }
 
     protected function checkAuth(\App\Services\JwtService $jwtService): array

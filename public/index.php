@@ -123,7 +123,9 @@ $router->add('GET', '/api/auth/validate', [$authCtrl, 'validateToken']);
 
 // External Public API
 $router->add('POST', '/api/v1/validate-subscription', [$externalApiCtrl, 'validateSubscription']);
+$router->add('GET', '/api/v1/validate-subscription', [$externalApiCtrl, 'validateSubscription']);
 $router->add('POST', '/api/v1/register-user', [$externalApiCtrl, 'registerUser']);
+$router->add('GET', '/api/v1/register-user', [$externalApiCtrl, 'registerUser']);
 
 // Handle Request
 $router->handle($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);
