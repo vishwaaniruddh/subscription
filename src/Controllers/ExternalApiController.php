@@ -136,7 +136,7 @@ class ExternalApiController extends BaseController
                     $canCreate = true;
                     $details = [
                         'service_id' => $service->id,
-                        'type' => $service->service_type,
+                        'type' => $service->serviceType,
                         'limit' => $service->userLimit,
                         'current' => $service->activeUserCount,
                         'expiry' => $service->endDate
