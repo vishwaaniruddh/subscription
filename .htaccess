@@ -1,0 +1,9 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # If the request is already for public, do nothing
+    RewriteCond %{REQUEST_URI} !^/subscription/public/
+    
+    # Rewrite everything else to public/
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

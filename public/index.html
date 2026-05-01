@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SubManager — Subscription Management System</title>
+    <meta name="description" content="Professional subscription management dashboard for managing clients, projects, services, and user allocations.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-overlay" id="login-overlay">
+        <div class="login-card fade-in">
+            <div class="login-header">
+                <div class="login-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                </div>
+                <h1>SubManager</h1>
+                <p>Administrative Access Required</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="login-username" required placeholder="Enter username">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="login-password" required placeholder="Enter password">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" id="btn-login">
+                    <span>Sign In</span>
+                    <div class="spinner-small" style="display:none"></div>
+                </button>
+            </form>
+            <div id="login-error" class="login-error" style="display:none"></div>
+        </div>
+    </div>
+
+    <div class="app-layout" id="app-container" style="display:none">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                        <path d="M2 17l10 5 10-5"/>
+                        <path d="M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <h1>SubManager</h1>
+                    <span class="brand-version">v2.0 Pro</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Main</div>
+                <a href="#dashboard" class="nav-link active" data-section="dashboard" id="nav-dashboard">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    </span>
+                    <span class="nav-text">Dashboard</span>
+                </a>
+                <a href="#clients" class="nav-link" data-section="clients" id="nav-clients">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </span>
+                    <span class="nav-text">Clients</span>
+                </a>
+
+                <div class="nav-section-label">Analytics</div>
+                <a href="#reporting" class="nav-link" data-section="reporting" id="nav-reporting">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                    </span>
+                    <span class="nav-text">Reports</span>
+                </a>
+                <a href="#activity" class="nav-link" data-section="activity" id="nav-activity">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+                    </span>
+                    <span class="nav-text">Activity Log</span>
+                </a>
+                <a href="#api-docs" class="nav-link" data-section="api-docs" id="nav-api-docs">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    </span>
+                    <span class="nav-text">API Docs</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">AD</div>
+                    <div class="user-details">
+                        <span class="user-name" id="display-admin-name">Admin</span>
+                        <span class="user-role">Super Admin</span>
+                    </div>
+                </div>
+                <button class="logout-btn" id="btn-logout" title="Logout">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content" id="main-content">
+            <!-- Top Header -->
+            <header class="top-header" id="top-header">
+                <div class="header-left">
+                    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle sidebar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                    <nav class="breadcrumb" id="breadcrumb">
+                        <a href="#dashboard" class="breadcrumb-item">Dashboard</a>
+                    </nav>
+                </div>
+                <div class="header-right">
+                    <button class="header-action-btn" id="global-add-btn" style="display:none;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        <span id="global-add-text">Add New</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="content-area" id="content-area">
+
+                <!-- ============ DASHBOARD ============ -->
+                <section id="section-dashboard" class="section active">
+                    <div class="section-header fade-in">
+                        <h2 class="section-title">Dashboard Overview</h2>
+                        <p class="section-subtitle">Real-time subscription insights and analytics</p>
+                    </div>
+
+                    <!-- Stats Row -->
+                    <div class="stats-grid fade-in" style="animation-delay:0.1s">
+                        <div class="stat-card" id="stat-card-active">
+                            <div class="stat-icon stat-icon-blue">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Active Subscriptions</span>
+                                <span class="stat-value" id="stat-active">—</span>
+                            </div>
+                        </div>
+                        <div class="stat-card" id="stat-card-expiring">
+                            <div class="stat-icon stat-icon-amber">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Expiring Soon (30d)</span>
+                                <span class="stat-value" id="stat-expiring">—</span>
+                            </div>
+                        </div>
+                        <div class="stat-card" id="stat-card-high">
+                            <div class="stat-icon stat-icon-red">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">High Utilization (≥90%)</span>
+                                <span class="stat-value" id="stat-high">—</span>
+                            </div>
+                        </div>
+                        <div class="stat-card" id="stat-card-clients">
+                            <div class="stat-icon stat-icon-emerald">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Total Clients</span>
+                                <span class="stat-value" id="stat-clients">—</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Tables -->
+                    <div class="dashboard-grid fade-in" style="animation-delay:0.2s">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-title-icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    Expiring Subscriptions
+                                </h3>
+                                <span class="card-badge badge-amber" id="expiring-count-badge">0</span>
+                            </div>
+                            <div class="card-body" id="expiring-list">
+                                <div class="empty-state">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    <p>All subscriptions are healthy</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-title-icon"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                                    High Utilization Alerts
+                                </h3>
+                                <span class="card-badge badge-red" id="high-count-badge">0</span>
+                            </div>
+                            <div class="card-body" id="high-util-list">
+                                <div class="empty-state">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="empty-icon"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                                    <p>No high utilization services</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ CLIENTS ============ -->
+                <section id="section-clients" class="section">
+                    <div class="section-header fade-in">
+                        <h2 class="section-title">Client Management</h2>
+                        <p class="section-subtitle">Manage your organization's client portfolio</p>
+                    </div>
+                    <div class="card fade-in" style="animation-delay:0.1s">
+                        <div class="card-header">
+                            <h3 class="card-title">All Clients</h3>
+                            <div class="card-actions">
+                                <div class="search-box" id="clients-search-box">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                    <input type="text" placeholder="Search clients..." id="clients-search" class="search-input">
+                                </div>
+                                <button class="btn btn-primary" id="btn-add-client">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                    Add Client
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body table-wrap" id="clients-list">
+                            <div class="loading-state"><div class="spinner"></div><p>Loading clients...</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ PROJECTS ============ -->
+                <section id="section-projects" class="section">
+                    <div class="section-header fade-in">
+                        <h2 class="section-title" id="projects-section-title">Projects</h2>
+                        <p class="section-subtitle" id="projects-section-subtitle">Manage projects under this client</p>
+                    </div>
+                    <div class="card fade-in" style="animation-delay:0.1s">
+                        <div class="card-header">
+                            <h3 class="card-title" id="projects-client-name">Projects</h3>
+                            <button class="btn btn-primary" id="btn-add-project">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Add Project
+                            </button>
+                        </div>
+                        <div class="card-body table-wrap" id="projects-list">
+                            <div class="loading-state"><div class="spinner"></div><p>Loading projects...</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ SERVICES ============ -->
+                <section id="section-services" class="section">
+                    <div class="section-header fade-in">
+                        <h2 class="section-title" id="services-section-title">Services</h2>
+                        <p class="section-subtitle" id="services-section-subtitle">Manage service subscriptions</p>
+                    </div>
+                    <div class="card fade-in" style="animation-delay:0.1s">
+                        <div class="card-header">
+                            <h3 class="card-title" id="services-project-name">Services</h3>
+                            <button class="btn btn-primary" id="btn-add-service">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Add Service
+                            </button>
+                        </div>
+                        <div class="card-body table-wrap" id="services-list">
+                            <div class="loading-state"><div class="spinner"></div><p>Loading services...</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ REPORTING ============ -->
+                <section id="section-reporting" class="section">
+                    <div class="section-header fade-in">
+                        <h2 class="section-title">Reports & Analytics</h2>
+                        <p class="section-subtitle">Subscription utilization insights and expiry tracking</p>
+                    </div>
+
+                    <div class="report-controls fade-in" style="animation-delay:0.1s">
+                        <div class="report-filter-group">
+                            <label class="filter-label">Expiry Window</label>
+                            <select id="report-expiry-days" class="filter-select">
+                                <option value="7">Next 7 days</option>
+                                <option value="14">Next 14 days</option>
+                                <option value="30" selected>Next 30 days</option>
+                                <option value="60">Next 60 days</option>
+                                <option value="90">Next 90 days</option>
+                            </select>
+                        </div>
+                        <div class="report-filter-group">
+                            <label class="filter-label">Utilization Threshold</label>
+                            <select id="report-util-threshold" class="filter-select">
+                                <option value="70">≥ 70%</option>
+                                <option value="80">≥ 80%</option>
+                                <option value="90" selected>≥ 90%</option>
+                                <option value="95">≥ 95%</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-secondary" id="btn-refresh-reports">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                            Refresh
+                        </button>
+                    </div>
+
+                    <div class="dashboard-grid fade-in" style="animation-delay:0.2s">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-title-icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                    Expiring Subscriptions
+                                </h3>
+                            </div>
+                            <div class="card-body table-wrap" id="report-expiring-list">
+                                <div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-title-icon"><path d="M18 20V10"/><path d="M12 20V4"/><path d="M6 20v-6"/></svg>
+                                    High Utilization Services
+                                </h3>
+                            </div>
+                            <div class="card-body table-wrap" id="report-high-list">
+                                <div class="loading-state"><div class="spinner"></div><p>Loading...</p></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ ACTIVITY LOG ============ -->
+                <section id="section-activity" class="section">
+                    <div class="section-header fade-in">
+                        <h2 class="section-title">Activity Log</h2>
+                        <p class="section-subtitle">Complete audit trail — every action is recorded</p>
+                    </div>
+                    <div class="card fade-in" style="animation-delay:0.1s">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="card-title-icon"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>
+                                Recent Activity
+                            </h3>
+                            <button class="btn btn-secondary" id="btn-refresh-activity">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                                Refresh
+                            </button>
+                        </div>
+                        <div class="card-body" id="activity-log-list">
+                            <div class="loading-state"><div class="spinner"></div><p>Loading activity...</p></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============ API DOCS ============ -->
+                <section id="section-api-docs" class="section">
+                    <div class="section-header fade-in">
+                        <h2 class="section-title">External API Documentation</h2>
+                        <p class="section-subtitle">Integrate subscription validation into your third-party applications</p>
+                    </div>
+
+                    <div class="api-docs-container fade-in" style="animation-delay:0.1s">
+                        <div class="doc-card">
+                            <h3>Validation API</h3>
+                            <p>Call this endpoint before creating a new user in your application to verify if the subscription limit has been reached.</p>
+                            
+                            <div class="endpoint-badge">
+                                <span class="method">POST</span>
+                                <span class="url">/api/v1/validate-subscription</span>
+                            </div>
+
+                            <h4>Authentication</h4>
+                            <p>Every request must include the <code>api_key</code> and the <code>domain</code> associated with the project.</p>
+
+                            <h4>Request Payload</h4>
+                            <div class="code-header">JSON Payload</div>
+                            <pre class="code-block"><code>{
+    "api_key": "YOUR_16_DIGIT_KEY",
+    "domain": "yourdomain.com"
+}</code></pre>
+
+                            <h4>Success Response (HTTP 200)</h4>
+                            <div class="code-header">Example Success</div>
+                            <pre class="code-block"><code>{
+    "status": "success",
+    "allowed": true,
+    "message": "User creation allowed.",
+    "data": {
+        "service_id": 12,
+        "type": "standard",
+        "limit": 100,
+        "current": 45,
+        "expiry": "2025-12-31"
+    }
+}</code></pre>
+
+                            <h4>Error Response (HTTP 403)</h4>
+                            <div class="code-header">Example Error (Limit Reached)</div>
+                            <pre class="code-block"><code>{
+    "status": "error",
+    "allowed": false,
+    "message": "Subscription limit reached or expired.",
+    "data": {
+        "limit": 100,
+        "current": 100,
+        "expiry": "2025-12-31"
+    }
+}</code></pre>
+                        </div>
+
+                        <div class="doc-card" style="margin-top:24px">
+                            <h3>User Registration API</h3>
+                            <p>Call this endpoint after successfully creating a user on your side to sync the count with the subscription module. This will automatically increment the active user count.</p>
+                            
+                            <div class="endpoint-badge">
+                                <span class="method">POST</span>
+                                <span class="url">/api/v1/register-user</span>
+                            </div>
+
+                            <h4>Request Payload</h4>
+                            <div class="code-header">JSON Payload</div>
+                            <pre class="code-block"><code>{
+    "api_key": "YOUR_16_DIGIT_KEY",
+    "domain": "yourdomain.com",
+    "username": "john_doe",
+    "email": "john@example.com"
+}</code></pre>
+
+                            <h4>Success Response (HTTP 200)</h4>
+                            <div class="code-header">Example Success</div>
+                            <pre class="code-block"><code>{
+    "status": "success",
+    "message": "User registered successfully.",
+    "data": {
+        "id": 105,
+        "username": "john_doe",
+        "service_id": 12,
+        "new_count": 46
+    }
+}</code></pre>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modal-title">Modal</h3>
+                <button class="modal-close" id="modal-close" aria-label="Close modal">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Confirm Dialog -->
+    <div class="modal-overlay" id="confirm-overlay">
+        <div class="modal confirm-modal" id="confirm-modal">
+            <div class="confirm-icon" id="confirm-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <h3 class="confirm-title" id="confirm-title">Confirm</h3>
+            <p class="confirm-message" id="confirm-message">Are you sure?</p>
+            <div class="confirm-actions">
+                <button class="btn btn-ghost" id="confirm-cancel">Cancel</button>
+                <button class="btn btn-danger" id="confirm-ok">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
