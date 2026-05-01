@@ -21,7 +21,7 @@ window.app = {
             try {
                 const res = await api.auth.validate();
                 this.onLoginSuccess(res.admin, token);
-            } catch(e) {
+            } catch (e) {
                 this.showLogin();
             }
         }
@@ -82,7 +82,7 @@ window.app = {
         try {
             const res = await api.auth.login({ username, password });
             this.onLoginSuccess(res.admin, res.token);
-        } catch(e) {
+        } catch (e) {
             error.textContent = e.message;
             error.style.display = 'block';
         } finally {
@@ -145,11 +145,11 @@ window.app = {
 
         // Load section data
         if (section === 'dashboard') this.loadDashboard();
-        if (section === 'clients')   this.loadClients();
+        if (section === 'clients') this.loadClients();
         if (section === 'projects' && id) this.loadProjects(id, false);
         if (section === 'services' && id) this.loadServices(id, false);
         if (section === 'reporting') this.loadReporting();
-        if (section === 'activity')  this.loadActivityLog();
+        if (section === 'activity') this.loadActivityLog();
     },
 
     // ===================== DASHBOARD =====================
@@ -172,7 +172,7 @@ window.app = {
                         const services = await api.services.listByProject(proj.id);
                         activeCount += services.filter(s => s.is_active).length;
                     }
-                } catch(e) { /* skip */ }
+                } catch (e) { /* skip */ }
             }
 
             this.animateNumber('stat-active', activeCount);
@@ -197,7 +197,7 @@ window.app = {
                 { label: 'Utilization', render: r => ui.utilBar(r.active_user_count || 0, r.user_limit || 1) }
             ], high);
 
-        } catch(e) {
+        } catch (e) {
             ui.showToast(e.message, 'error');
         }
     },
@@ -215,7 +215,7 @@ window.app = {
             const clients = await api.clients.list();
             this._clientsData = clients;
             this.renderClientTable(clients);
-        } catch(e) {
+        } catch (e) {
             ui.showToast(e.message, 'error');
         }
     },
@@ -258,7 +258,7 @@ window.app = {
                     <button class="btn btn-secondary btn-block" onclick="ui.closeModal()">Close</button>
                 </div>
             `);
-        } catch(e) { ui.showToast(e.message, 'error'); }
+        } catch (e) { ui.showToast(e.message, 'error'); }
     },
 
     filterClients(query) {
@@ -277,7 +277,7 @@ window.app = {
                 await api.clients.delete(id);
                 ui.showToast('Client deleted successfully');
                 this.loadClients();
-            } catch(e) {
+            } catch (e) {
                 ui.showToast(e.message, 'error');
             }
         });
@@ -312,7 +312,7 @@ window.app = {
                 ui.closeModal();
                 ui.showToast('Client created successfully');
                 this.loadClients();
-            } catch(err) { ui.showToast(err.message, 'error'); }
+            } catch (err) { ui.showToast(err.message, 'error'); }
         };
     },
 
@@ -344,9 +344,9 @@ window.app = {
                     ui.closeModal();
                     ui.showToast('Client updated successfully');
                     this.loadClients();
-                } catch(err) { ui.showToast(err.message, 'error'); }
+                } catch (err) { ui.showToast(err.message, 'error'); }
             };
-        } catch(err) { ui.showToast(err.message, 'error'); }
+        } catch (err) { ui.showToast(err.message, 'error'); }
     },
 
     // ===================== PROJECTS =====================
@@ -358,7 +358,7 @@ window.app = {
         try {
             const client = await api.clients.get(clientId);
             this.currentClientName = client.name || `Client #${clientId}`;
-        } catch(e) {
+        } catch (e) {
             this.currentClientName = `Client #${clientId}`;
         }
 
@@ -382,16 +382,16 @@ window.app = {
                 { label: 'Created', render: r => r.created_at ? new Date(r.created_at).toLocaleDateString() : '—' }
             ], projects, [
                 { label: 'Services', handler: 'app.loadServices', class: 'action-btn action-btn-primary' },
-                { 
-                    label: 'Generate Key', 
-                    handler: 'app.generateApiKey', 
+                {
+                    label: 'Generate Key',
+                    handler: 'app.generateApiKey',
                     class: 'action-btn action-btn-emerald',
                     hide: r => !!r.api_key // Custom logic to hide if key exists
                 },
                 { label: 'Edit', handler: 'app.showEditProjectModal', class: 'action-btn action-btn-amber' },
                 { label: 'Delete', handler: 'app.deleteProject', class: 'action-btn action-btn-danger' }
             ]);
-        } catch(e) { ui.showToast(e.message, 'error'); }
+        } catch (e) { ui.showToast(e.message, 'error'); }
     },
 
     async generateApiKey(id) {
@@ -406,11 +406,11 @@ window.app = {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
             let key = '';
             for (let i = 0; i < 16; i++) key += chars.charAt(Math.floor(Math.random() * chars.length));
-        
+
             await api.projects.update(id, { api_key: key });
             ui.showToast('API key generated successfully');
             this.loadProjects(this.currentClientId, false);
-        } catch(e) { ui.showToast(e.message, 'error'); }
+        } catch (e) { ui.showToast(e.message, 'error'); }
     },
 
     async deleteProject(id) {
@@ -419,7 +419,7 @@ window.app = {
                 await api.projects.delete(id);
                 ui.showToast('Project deleted');
                 this.loadProjects(this.currentClientId, false);
-            } catch(e) { ui.showToast(e.message, 'error'); }
+            } catch (e) { ui.showToast(e.message, 'error'); }
         });
     },
 
@@ -454,7 +454,7 @@ window.app = {
                 ui.closeModal();
                 ui.showToast('Project created');
                 this.loadProjects(this.currentClientId, false);
-            } catch(err) { ui.showToast(err.message, 'error'); }
+            } catch (err) { ui.showToast(err.message, 'error'); }
         };
     },
 
@@ -486,9 +486,9 @@ window.app = {
                     ui.closeModal();
                     ui.showToast('Project updated successfully');
                     this.loadProjects(this.currentClientId, false);
-                } catch(err) { ui.showToast(err.message, 'error'); }
+                } catch (err) { ui.showToast(err.message, 'error'); }
             };
-        } catch(err) { ui.showToast(err.message, 'error'); }
+        } catch (err) { ui.showToast(err.message, 'error'); }
     },
 
     // ===================== SERVICES =====================
@@ -499,7 +499,7 @@ window.app = {
         try {
             const project = await api.projects.get(projectId);
             this.currentProjectName = project.name || `Project #${projectId}`;
-        } catch(e) {
+        } catch (e) {
             this.currentProjectName = `Project #${projectId}`;
         }
 
@@ -513,6 +513,7 @@ window.app = {
         document.getElementById('services-section-title').textContent = `${this.currentProjectName} — Services`;
         document.getElementById('services-section-subtitle').textContent = 'Manage service subscriptions and user limits';
         document.getElementById('services-project-name').textContent = 'All Services';
+
 
         try {
             const services = await api.services.listByProject(projectId);
@@ -530,7 +531,7 @@ window.app = {
                 { label: 'Edit', handler: 'app.showEditServiceModal', class: 'action-btn action-btn-primary' },
                 { label: 'Delete', handler: 'app.deleteService', class: 'action-btn action-btn-danger' }
             ]);
-        } catch(e) { ui.showToast(e.message, 'error'); }
+        } catch (e) { ui.showToast(e.message, 'error'); }
     },
 
     async deleteService(id) {
@@ -539,7 +540,7 @@ window.app = {
                 await api.services.delete(id);
                 ui.showToast('Service deleted');
                 this.loadServices(this.currentProjectId, false);
-            } catch(e) { ui.showToast(e.message, 'error'); }
+            } catch (e) { ui.showToast(e.message, 'error'); }
         });
     },
 
@@ -585,7 +586,7 @@ window.app = {
                 ui.closeModal();
                 ui.showToast('Service created');
                 this.loadServices(this.currentProjectId, false);
-            } catch(err) { ui.showToast(err.message, 'error'); }
+            } catch (err) { ui.showToast(err.message, 'error'); }
         };
     },
 
@@ -627,9 +628,9 @@ window.app = {
                     ui.closeModal();
                     ui.showToast('Service updated successfully');
                     this.loadServices(this.currentProjectId, false);
-                } catch(err) { ui.showToast(err.message, 'error'); }
+                } catch (err) { ui.showToast(err.message, 'error'); }
             };
-        } catch(err) { ui.showToast(err.message, 'error'); }
+        } catch (err) { ui.showToast(err.message, 'error'); }
     },
 
     async showRenewModal(id) {
@@ -661,9 +662,9 @@ window.app = {
                     ui.closeModal();
                     ui.showToast('Subscription renewed');
                     this.loadServices(this.currentProjectId, false);
-                } catch(err) { ui.showToast(err.message, 'error'); }
+                } catch (err) { ui.showToast(err.message, 'error'); }
             };
-        } catch(err) { ui.showToast(err.message, 'error'); }
+        } catch (err) { ui.showToast(err.message, 'error'); }
     },
 
     async showActiveUsers(serviceId) {
@@ -671,9 +672,9 @@ window.app = {
             ui.showModal('Active Users', `
                 <div class="loading-state"><div class="spinner"></div><p>Loading user list...</p></div>
             `);
-            
+
             const users = await api.users.listByService(serviceId);
-            
+
             ui.showModal(`Active Users — ${users.length} registered`, `
                 <div class="fade-in">
                     <div style="margin-bottom:15px;max-height:400px;overflow-y:auto;border:1px solid var(--border-color);border-radius:8px">
@@ -703,7 +704,7 @@ window.app = {
                     <button class="btn btn-secondary btn-block" onclick="ui.closeModal()">Close</button>
                 </div>
             `);
-        } catch(e) { ui.showToast(e.message, 'error'); }
+        } catch (e) { ui.showToast(e.message, 'error'); }
     },
 
     async deactivateUserInModal(userId, serviceId) {
@@ -713,7 +714,7 @@ window.app = {
                 ui.showToast('User removed');
                 this.showActiveUsers(serviceId);
                 this.loadServices(this.currentProjectId, false);
-            } catch(e) { ui.showToast(e.message, 'error'); }
+            } catch (e) { ui.showToast(e.message, 'error'); }
         });
     },
 
@@ -756,9 +757,9 @@ window.app = {
                     ui.closeModal();
                     ui.showToast('Subscription extended');
                     this.loadServices(this.currentProjectId, false);
-                } catch(err) { ui.showToast(err.message, 'error'); }
+                } catch (err) { ui.showToast(err.message, 'error'); }
             };
-        } catch(err) { ui.showToast(err.message, 'error'); }
+        } catch (err) { ui.showToast(err.message, 'error'); }
     },
 
     // ===================== ACTIVITY LOG =====================
@@ -771,7 +772,7 @@ window.app = {
         try {
             const result = await api.activityLog.list(100);
             const logs = result.data || [];
-            
+
             ui.renderTable('activity-log-list', [
                 { label: 'Time', render: r => `<span style="color:var(--text-muted);font-size:0.75rem">${new Date(r.created_at).toLocaleString()}</span>` },
                 { label: 'Entity', render: r => `<span class="card-badge badge-blue">${r.entity_type.toUpperCase()}</span>` },
@@ -779,7 +780,7 @@ window.app = {
                 { label: 'Description', render: r => `<span style="color:var(--text-primary)">${r.description}</span>` },
                 { label: 'IP Address', render: r => `<span style="color:var(--text-muted)">${r.ip_address || '—'}</span>` }
             ], logs);
-        } catch(e) { ui.showToast(e.message, 'error'); }
+        } catch (e) { ui.showToast(e.message, 'error'); }
     },
 
     // ===================== REPORTING =====================
@@ -811,7 +812,7 @@ window.app = {
                 { label: 'Utilization', render: r => ui.utilBar(r.active_user_count || 0, r.user_limit || 1) }
             ], high);
 
-        } catch(e) { ui.showToast(e.message, 'error'); }
+        } catch (e) { ui.showToast(e.message, 'error'); }
     },
 
     // ===================== HELPERS =====================
@@ -837,7 +838,7 @@ window.app = {
 // Boot
 document.addEventListener('DOMContentLoaded', () => {
     app.init();
-    
+
     // Activity refresh button wiring (extra safety)
     const refreshAct = document.getElementById('btn-refresh-activity');
     if (refreshAct) refreshAct.onclick = () => app.loadActivityLog();
