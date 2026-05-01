@@ -49,11 +49,13 @@ class ExternalApiController extends BaseController
                 $this->errorResponse("Unauthorized: Invalid API Key or Domain.", 401);
             }
 
-            // 2. Find first available service
+            // 2. Find available service matching the requested type
+            $requestedType = strtolower($data['service_type'] ?? 'web');
             $services = $this->serviceRepo->findByProjectId($project['id']);
             $targetService = null;
             foreach ($services as $s) {
-                if (strtotime($s->endDate) >= time() && $s->activeUserCount < $s->userLimit) {
+                // Check if service matches type (case-insensitive), is not expired, and has capacity
+                if (strtolower($s->serviceType) === $requestedType && strtotime($s->endDate) >= time() && $s->activeUserCount < $s->userLimit) {
                     $targetService = $s;
                     break;
                 }
@@ -180,17 +182,20 @@ class ExternalApiController extends BaseController
             }
 
             // 2. Get Services for this project
+            $requestedType = strtolower($data['service_type'] ?? 'web');
             $services = $this->serviceRepo->findByProjectId($project['id']);
             
             if (empty($services)) {
                 $this->errorResponse("No active subscription found for this project.", 404);
             }
 
-            // Check if any service has room
+            // Check if any service matching the type has room
             $canCreate = false;
             $details = [];
 
             foreach ($services as $service) {
+                if (strtolower($service->serviceType) !== $requestedType) continue;
+
                 $isExpired = strtotime($service->endDate) < time();
                 $limitReached = $service->activeUserCount >= $service->userLimit;
 
