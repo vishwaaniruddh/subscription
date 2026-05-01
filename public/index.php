@@ -1,6 +1,8 @@
 <?php
 
 require_once __DIR__ . '/../vendor/autoload.php';
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 use App\Database;
 use App\Router;
@@ -126,6 +128,8 @@ $router->add('POST', '/api/v1/validate-subscription', [$externalApiCtrl, 'valida
 $router->add('GET', '/api/v1/validate-subscription', [$externalApiCtrl, 'validateSubscription']);
 $router->add('POST', '/api/v1/register-user', [$externalApiCtrl, 'registerUser']);
 $router->add('GET', '/api/v1/register-user', [$externalApiCtrl, 'registerUser']);
+$router->add('POST', '/api/v1/deactivate-user', [$externalApiCtrl, 'deactivateUser']);
+$router->add('GET', '/api/v1/deactivate-user', [$externalApiCtrl, 'deactivateUser']);
 
 // Handle Request
 $router->handle($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI']);

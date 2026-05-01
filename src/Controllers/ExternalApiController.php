@@ -64,8 +64,9 @@ class ExternalApiController extends BaseController
             }
 
             // 3. Register User (This increments count automatically)
-            $user = $this->userService->registerUser($targetService->id, [
-                'username' => $username,
+            $user = $this->userService->registerUser([
+                'service_id' => $targetService->id,
+                'user_identifier' => $username,
                 'email' => $email
             ]);
 
@@ -79,11 +80,72 @@ class ExternalApiController extends BaseController
                 'message' => "User registered successfully.",
                 'data' => [
                     'id' => $user->id,
-                    'username' => $user->username,
+                    'username' => $user->userIdentifier,
                     'service_id' => $targetService->id,
                     'new_count' => $targetService->activeUserCount + 1
                 ]
             ]);
+
+        } catch (\Throwable $e) {
+            $this->errorResponse($e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * POST /api/v1/deactivate-user
+     * Deactivates a user by username/email and decrements the active count.
+     */
+    public function deactivateUser(): void
+    {
+        try {
+            $data = $this->getRequestData();
+            $apiKey = $data['api_key'] ?? '';
+            $domain = $data['domain'] ?? '';
+            $username = $data['username'] ?? '';
+
+            if (empty($apiKey) || empty($domain) || empty($username)) {
+                $this->errorResponse("API Key, Domain and Username are required.", 400);
+            }
+
+            // 1. Auth Project
+            $project = $this->findProjectByAuth($apiKey, $domain);
+            if (!$project) {
+                $this->errorResponse("Unauthorized: Invalid API Key or Domain.", 401);
+            }
+
+            // 2. Find the user in the subscription database for this project's services
+            $db = \App\Database::getInstance();
+            $stmt = $db->prepare("
+                SELECT u.* FROM users u 
+                JOIN services s ON u.service_id = s.id 
+                WHERE s.project_id = :project_id 
+                AND u.user_identifier = :username 
+                AND u.status = 'active'
+                LIMIT 1
+            ");
+            $stmt->execute(['project_id' => $project['id'], 'username' => $username]);
+            $userRow = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$userRow) {
+                $this->errorResponse("Active user \"{$username}\" not found for this project.", 404);
+            }
+
+            // 3. Deactivate User (This decrements count automatically)
+            $success = $this->userService->deactivateUser((int)$userRow['id']);
+
+            if ($success) {
+                $this->activityLog->log('external_api', $project['id'], 'user_deactivated', 
+                    "User \"{$username}\" deactivated via API for Project \"{$project['name']}\"",
+                    null, ['username' => $username]
+                );
+
+                $this->jsonResponse([
+                    'status' => 'success',
+                    'message' => "User deactivated successfully."
+                ]);
+            } else {
+                $this->errorResponse("Failed to deactivate user.");
+            }
 
         } catch (Exception $e) {
             $this->errorResponse($e->getMessage());
