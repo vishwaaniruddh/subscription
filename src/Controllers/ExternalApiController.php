@@ -37,6 +37,7 @@ class ExternalApiController extends BaseController
             $apiKey = $data['api_key'] ?? '';
             $domain = $data['domain'] ?? '';
             $username = $data['username'] ?? 'ext_user_' . time();
+            $name = $data['name'] ?? null;
             $email = $data['email'] ?? null;
 
             if (empty($apiKey) || empty($domain)) {
@@ -69,6 +70,7 @@ class ExternalApiController extends BaseController
             $user = $this->userService->registerUser([
                 'service_id' => $targetService->id,
                 'user_identifier' => $username,
+                'name' => $name,
                 'email' => $email
             ]);
 

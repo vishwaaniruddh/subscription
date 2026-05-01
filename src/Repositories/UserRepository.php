@@ -9,10 +9,12 @@ class UserRepository extends BaseRepository
 {
     public function create(User $user): User
     {
-        $stmt = $this->db->prepare("INSERT INTO users (service_id, user_identifier, status) VALUES (:service_id, :user_identifier, :status)");
+        $stmt = $this->db->prepare("INSERT INTO users (service_id, user_identifier, name, email, status) VALUES (:service_id, :user_identifier, :name, :email, :status)");
         $stmt->execute([
             'service_id' => $user->serviceId,
             'user_identifier' => $user->userIdentifier,
+            'name' => $user->name,
+            'email' => $user->email,
             'status' => $user->status
         ]);
         $user->id = (int)$this->db->lastInsertId();

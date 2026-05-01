@@ -519,7 +519,7 @@ window.app = {
             ui.renderTable('services-list', [
                 { label: '#', render: (r, i) => `<span style="color:var(--text-muted)">${i + 1}</span>` },
                 { label: 'Type', render: r => ui.typeBadge(r.service_type) },
-                { label: 'Users', render: r => `<span style="font-weight:600">${r.active_user_count}</span> <span style="color:var(--text-muted)">/ ${r.user_limit}</span>` },
+                { label: 'Users', render: r => `<a href="javascript:void(0)" onclick="app.showActiveUsers(${r.id})" class="clickable-count">${r.active_user_count}</a> <span style="color:var(--text-muted)">/ ${r.user_limit}</span>` },
                 { label: 'Utilization', render: r => ui.utilBar(r.active_user_count || 0, r.user_limit || 1) },
                 { label: 'Status', render: r => ui.statusBadge(r.is_active) },
                 { label: 'Start', key: 'start_date' },
@@ -664,6 +664,57 @@ window.app = {
                 } catch(err) { ui.showToast(err.message, 'error'); }
             };
         } catch(err) { ui.showToast(err.message, 'error'); }
+    },
+
+    async showActiveUsers(serviceId) {
+        try {
+            ui.showModal('Active Users', `
+                <div class="loading-state"><div class="spinner"></div><p>Loading user list...</p></div>
+            `);
+            
+            const users = await api.users.listByService(serviceId);
+            
+            ui.showModal(`Active Users — ${users.length} registered`, `
+                <div class="fade-in">
+                    <div style="margin-bottom:15px;max-height:400px;overflow-y:auto;border:1px solid var(--border-color);border-radius:8px">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Username</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th style="text-align:right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${users.map(u => `
+                                    <tr>
+                                        <td style="font-family:monospace;font-size:0.9em">${u.user_identifier}</td>
+                                        <td>${u.name || '—'}</td>
+                                        <td style="font-size:0.9em">${u.email || '—'}</td>
+                                        <td style="text-align:right">
+                                            <button class="action-btn action-btn-danger" onclick="app.deactivateUserInModal(${u.id}, ${serviceId})">Remove</button>
+                                        </td>
+                                    </tr>
+                                `).join('') || '<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--text-muted)">No users found</td></tr>'}
+                            </tbody>
+                        </table>
+                    </div>
+                    <button class="btn btn-secondary btn-block" onclick="ui.closeModal()">Close</button>
+                </div>
+            `);
+        } catch(e) { ui.showToast(e.message, 'error'); }
+    },
+
+    async deactivateUserInModal(userId, serviceId) {
+        ui.showConfirm('Remove User', 'Are you sure you want to remove this user from this service subscription?', async () => {
+            try {
+                await api.users.deactivate(userId);
+                ui.showToast('User removed');
+                this.showActiveUsers(serviceId);
+                this.loadServices(this.currentProjectId, false);
+            } catch(e) { ui.showToast(e.message, 'error'); }
+        });
     },
 
     async showExtendModal(id) {

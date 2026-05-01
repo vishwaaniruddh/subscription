@@ -772,3 +772,18 @@ pre { margin: 0; }
     height: 20px;
 }
 
+.clickable-count {
+    color: var(--accent-blue);
+    font-weight: 700;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.clickable-count:hover {
+    color: var(--accent-blue-hover);
+    background: rgba(99,102,241,0.1);
+}
+
