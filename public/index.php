@@ -51,7 +51,7 @@ $clientService     = new ClientService($clientRepo);
 $projectService    = new ProjectService($projectRepo);
 $serviceManager    = new ServiceManager($serviceRepo);
 $validationService = new ValidationService($serviceRepo);
-$userService       = new UserService($userRepo, $serviceRepo, $validationService);
+$userService       = new UserService($userRepo, $serviceRepo, $validationService, $historyRepo);
 $lifecycleManager  = new SubscriptionLifecycleManager($serviceRepo, $historyRepo);
 $jwtService        = new App\Services\JwtService();
 
@@ -108,6 +108,7 @@ $router->add('DELETE', '/api/users/{userId}', [$userCtrl, 'deactivate']);
 $router->add('POST', '/api/services/{serviceId}/renew', [$subscriptionCtrl, 'renew']);
 $router->add('POST', '/api/services/{serviceId}/extend', [$subscriptionCtrl, 'extend']);
 $router->add('GET', '/api/services/{serviceId}/status', [$subscriptionCtrl, 'status']);
+$router->add('GET', '/api/services/{serviceId}/history', [$subscriptionCtrl, 'history']);
 
 // Reporting Routes
 $router->add('GET', '/api/clients/{clientId}/utilization', [$reportingCtrl, 'clientUtilization']);

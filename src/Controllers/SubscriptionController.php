@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Services\SubscriptionLifecycleManager;
 use App\Services\ServiceManager;
 use App\Repositories\ActivityLogRepository;
+use App\Repositories\SubscriptionHistoryRepository;
 use Exception;
 
 class SubscriptionController extends BaseController
@@ -109,4 +110,30 @@ class SubscriptionController extends BaseController
             'end_date' => $service->endDate
         ]);
     }
+
+    /**
+     * GET /api/services/{serviceId}/history
+     * Returns subscription change history for a service.
+     */
+    public function history(int $serviceId): void
+    {
+        try {
+            $historyRepo = new SubscriptionHistoryRepository(\App\Database::getInstance());
+            $records = $historyRepo->findByServiceId($serviceId);
+            
+            $result = [];
+            foreach ($records as $record) {
+                $entry = $record->toArray();
+                // Decode JSON values for display
+                if ($entry['old_value']) $entry['old_value'] = json_decode($entry['old_value'], true) ?: $entry['old_value'];
+                if ($entry['new_value']) $entry['new_value'] = json_decode($entry['new_value'], true) ?: $entry['new_value'];
+                $result[] = $entry;
+            }
+
+            $this->jsonResponse(['success' => true, 'history' => $result]);
+        } catch (Exception $e) {
+            $this->errorResponse($e->getMessage());
+        }
+    }
 }
+

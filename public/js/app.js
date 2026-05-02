@@ -528,6 +528,7 @@ window.app = {
             ], services, [
                 { label: 'Renew', handler: 'app.showRenewModal', class: 'action-btn action-btn-emerald' },
                 { label: 'Extend', handler: 'app.showExtendModal', class: 'action-btn action-btn-amber' },
+                { label: 'History', handler: 'app.showServiceHistory', class: 'action-btn action-btn-blue' },
                 { label: 'Edit', handler: 'app.showEditServiceModal', class: 'action-btn action-btn-primary' },
                 { label: 'Delete', handler: 'app.deleteService', class: 'action-btn action-btn-danger' }
             ]);
@@ -716,6 +717,60 @@ window.app = {
                 this.loadServices(this.currentProjectId, false);
             } catch (e) { ui.showToast(e.message, 'error'); }
         });
+    },
+
+    async showServiceHistory(serviceId) {
+        try {
+            ui.showModal('Subscription History', `
+                <div class="loading-state"><div class="spinner"></div><p>Loading history...</p></div>
+            `);
+
+            const result = await api.services.getHistory(serviceId);
+            const history = result.history || [];
+
+            const actionLabels = {
+                'user_registered': { label: 'User Registered', badge: 'badge-emerald', icon: '↗' },
+                'user_deactivated': { label: 'User Deactivated', badge: 'badge-danger', icon: '↘' },
+                'renewed': { label: 'Renewed', badge: 'badge-blue', icon: '↻' },
+                'extended': { label: 'Extended', badge: 'badge-amber', icon: '⇧' }
+            };
+
+            let html = '';
+            if (history.length === 0) {
+                html = '<div style="text-align:center;padding:30px;color:var(--text-muted)"><p>No history records yet.</p></div>';
+            } else {
+                html = `<div style="max-height:450px;overflow-y:auto;padding-right:5px">`;
+                history.forEach(h => {
+                    const meta = actionLabels[h.action_type] || { label: h.action_type, badge: 'badge-blue', icon: '●' };
+                    const timestamp = h.timestamp ? new Date(h.timestamp).toLocaleString() : '—';
+                    const oldVal = typeof h.old_value === 'object' && h.old_value ? h.old_value : {};
+                    const newVal = typeof h.new_value === 'object' && h.new_value ? h.new_value : {};
+
+                    let details = '';
+                    if (oldVal.username) details += `<strong>User:</strong> ${oldVal.username}<br>`;
+                    if (newVal.active_user_count !== undefined && oldVal.active_user_count !== undefined) {
+                        details += `<strong>Count:</strong> ${oldVal.active_user_count} → ${newVal.active_user_count}`;
+                    }
+
+                    html += `
+                        <div style="display:flex;gap:12px;padding:12px;margin-bottom:8px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;align-items:flex-start">
+                            <div style="font-size:1.4rem;min-width:28px;text-align:center;line-height:1">${meta.icon}</div>
+                            <div style="flex:1">
+                                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                                    <span class="card-badge ${meta.badge}">${meta.label}</span>
+                                    <span style="color:var(--text-muted);font-size:0.75rem">${timestamp}</span>
+                                </div>
+                                ${details ? `<div style="font-size:0.85rem;color:var(--text-secondary);line-height:1.5">${details}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            html += `<button class="btn btn-secondary btn-block" style="margin-top:15px" onclick="ui.closeModal()">Close</button>`;
+            ui.showModal(`Subscription History — ${history.length} records`, `<div class="fade-in">${html}</div>`);
+        } catch (e) { ui.showToast(e.message, 'error'); }
     },
 
     async showExtendModal(id) {

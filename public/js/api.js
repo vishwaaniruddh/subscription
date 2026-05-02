@@ -64,7 +64,8 @@ export const api = {
         delete:        (id)   => request(`api/services/${id}`, 'DELETE'),
         getStatus:     (id)   => request(`api/services/${id}/status`),
         renew:         (id,d) => request(`api/services/${id}/renew`, 'POST', d),
-        extend:        (id,d) => request(`api/services/${id}/extend`, 'POST', d)
+        extend:        (id,d) => request(`api/services/${id}/extend`, 'POST', d),
+        getHistory:    (id)   => request(`api/services/${id}/history`)
     },
     users: {
         listByService: (sid)  => request(`api/services/${sid}/users`),
